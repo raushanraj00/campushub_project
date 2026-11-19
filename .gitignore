@@ -1,0 +1,59 @@
+# ==========================================
+# CampusHub ERP - .gitignore
+# ==========================================
+
+# Compiled Class Files
+*.class
+*.exe
+
+# Log files
+*.log
+logs/
+
+# Package Files
+*.war
+*.nar
+*.ear
+
+# Maven Target Build Directory
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# Visual Studio Code
+.vscode/
+
+# OS-specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment and Local Overrides
+*.env
+*.local

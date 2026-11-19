@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CampusHub ERP – Sign In</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;height:100vh;display:flex;background:#f8fafc;overflow:hidden;}
+.left-panel{width:42%;background:linear-gradient(145deg,#0b1329 0%,#162a45 50%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;position:relative;overflow:hidden;}
+.left-panel::before{content:'';position:absolute;top:-80px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,0.28) 0%,rgba(37,99,235,0) 70%);pointer-events:none;animation:floatOrb1 14s ease-in-out infinite alternate;}
+.left-panel::after{content:'';position:absolute;bottom:-60px;left:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.2) 0%,rgba(56,189,248,0) 70%);pointer-events:none;animation:floatOrb2 18s ease-in-out infinite alternate;}
+
+#loginCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto;z-index:1;}
+.left-content-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;}
+
+.logo-shield{width:76px;height:76px;background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 10px 30px rgba(37,99,235,0.45);animation:shieldPulse 4s ease-in-out infinite;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);}
+.logo-shield:hover{transform:scale(1.08) rotate(3deg);}
+.logo-shield svg{width:42px;height:42px;}
+.brand-name{font-size:32px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:8px;text-shadow:0 2px 10px rgba(0,0,0,0.3);}
+.brand-sub{font-size:14px;color:#94a3b8;margin-bottom:28px;text-align:center;line-height:1.5;}
+.feature-pills{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;}
+.pill{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:11px 16px;color:#cbd5e1;font-size:12.5px;display:flex;align-items:center;gap:10px;transition:all 0.25s cubic-bezier(0.16,1,0.3,1);backdrop-filter:blur(6px);cursor:default;}
+.pill:hover{transform:translateX(6px);background:rgba(255,255,255,0.12);border-color:rgba(96,165,250,0.5);box-shadow:0 4px 16px rgba(0,0,0,0.15);}
+.pill-dot{width:8px;height:8px;border-radius:50%;background:#38bdf8;flex-shrink:0;box-shadow:0 0 8px rgba(56,189,248,0.6);transition:transform 0.25s,box-shadow 0.25s;}
+.pill:hover .pill-dot{transform:scale(1.4);box-shadow:0 0 12px #38bdf8;}
+.version{position:relative;margin-top:20px;font-size:11px;color:#64748b;text-align:center;letter-spacing:0.3px;}
+
+/* CREATOR CARD - Live glowing interactive card */
+.creator-card{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:16px;
+  padding:14px 18px;
+  width:100%;
+  max-width:340px;
+  margin-top:22px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.2);
+  transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+  cursor:default;
+}
+.creator-card:hover{
+  transform:translateY(-3px) scale(1.02);
+  border-color:rgba(96,165,250,0.7);
+  box-shadow:0 14px 36px rgba(37,99,235,0.35);
+  background:rgba(255,255,255,0.12);
+}
+.creator-avatar{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:0.5px;
+  box-shadow:0 4px 16px rgba(37,99,235,0.45);
+  flex-shrink:0;
+  transition:transform 0.3s ease;
+}
+.creator-card:hover .creator-avatar{
+  transform:rotate(5deg) scale(1.08);
+}
+.creator-content{flex:1;}
+.creator-badge-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  color:#60a5fa;
+  margin-bottom:2px;
+}
+.creator-badge-tag::before{
+  content:'';
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#10b981;
+  box-shadow:0 0 8px #10b981;
+  animation:greenPulse 2s infinite ease-in-out;
+}
+.creator-name{
+  font-size:16px;
+  font-weight:700;
+  color:#ffffff;
+  letter-spacing:-0.2px;
+}
+.creator-role{
+  font-size:11.5px;
+  color:#94a3b8;
+  margin-top:2px;
+}
+
+/* KEYFRAMES */
+@keyframes floatOrb1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(30px, -25px, 0) scale(1.18); }
+  100% { transform: translate3d(-20px, 20px, 0) scale(0.95); }
+}
+@keyframes floatOrb2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-35px, 30px, 0) scale(1.2); }
+  100% { transform: translate3d(25px, -20px, 0) scale(0.9); }
+}
+@keyframes shieldPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(37,99,235,0.45); }
+  50% { transform: scale(1.04); box-shadow: 0 14px 40px rgba(37,99,235,0.7), 0 0 25px rgba(56,189,248,0.4); }
+}
+@keyframes greenPulse {
+  0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px #10b981; }
+  50% { transform: scale(1.4); opacity: 0.75; box-shadow: 0 0 14px #10b981; }
+}
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.page-footer-note{
+  text-align:center;
+  font-size:12px;
+  color:#64748b;
+  margin-top:14px;
+}
+.page-footer-note b{
+  color:#2563eb;
+}
+.right-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;background:#f8fafc;overflow-y:auto;}
+.form-card{
+  background:#fff;
+  border-radius:22px;
+  padding:36px 36px;
+  width:100%;
+  max-width:440px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04);
+  border:1px solid #e2e8f0;
+  animation:cardEntrance 0.65s cubic-bezier(0.16,1,0.3,1) forwards;
+  transition:transform 0.3s ease,box-shadow 0.3s ease;
+}
+.form-card:hover{
+  box-shadow:0 16px 40px rgba(0,0,0,0.08),0 2px 6px rgba(0,0,0,0.04);
+}
+.form-title{font-size:24px;font-weight:700;color:#0f172a;margin-bottom:4px;}
+.form-sub{font-size:13px;color:#64748b;margin-bottom:20px;}
+.notice-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:#1e40af;line-height:1.4;transition:all 0.2s;}
+.notice-box:hover{background:#e0f2fe;border-color:#93c5fd;}
+.notice-box b{color:#1d4ed8;}
+.field-label{font-size:11.5px;font-weight:600;color:#475569;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.5px;}
+.input-wrap{position:relative;margin-bottom:16px;}
+.input-wrap input{
+  width:100%;
+  padding:11px 14px;
+  border:1.5px solid #e2e8f0;
+  border-radius:11px;
+  font-size:14px;
+  font-family:inherit;
+  color:#0f172a;
+  background:#fff;
+  outline:none;
+  transition:border-color 0.2s ease,box-shadow 0.2s ease,transform 0.2s ease;
+}
+.input-wrap input:focus{
+  border-color:#2563eb;
+  box-shadow:0 0 0 3.5px rgba(37,99,235,0.12),0 4px 12px rgba(37,99,235,0.06);
+  transform:translateY(-1px);
+}
+.input-wrap .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:0.4;transition:opacity 0.2s;}
+.input-wrap input:focus ~ .icon,.input-wrap:focus-within .icon{opacity:0.85;color:#2563eb;}
+.input-wrap.with-icon input{padding-left:42px;}
+.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;opacity:0.5;padding:4px;display:flex;align-items:center;transition:opacity 0.2s,transform 0.2s;}
+.eye-btn:hover{opacity:0.95;transform:translateY(-50%) scale(1.1);}
+
+.btn-primary{
+  width:100%;
+  padding:12.5px;
+  background:linear-gradient(90deg,#2563eb,#3b82f6,#1d4ed8,#2563eb);
+  background-size:250% 100%;
+  color:#fff;
+  border:none;
+  border-radius:11px;
+  font-size:14.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+  margin-top:4px;
+  font-family:inherit;
+  box-shadow:0 4px 14px rgba(37,99,235,0.3);
+}
+.btn-primary:hover{
+  background-position:100% 0;
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(37,99,235,0.45);
+}
+.btn-primary:active{transform:translateY(0) scale(0.99);}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
+
+.btn-directory{
+  width:100%;
+  padding:10.5px;
+  background:#f8fafc;
+  color:#1e293b;
+  border:1.5px dashed #cbd5e1;
+  border-radius:11px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  transition:all 0.2s ease;
+  font-family:inherit;
+}
+.btn-directory:hover{
+  background:#eff6ff;
+  border-color:#3b82f6;
+  color:#1d4ed8;
+  transform:translateY(-1px);
+}
+
+.divider{text-align:center;margin:18px 0 14px;color:#94a3b8;font-size:11.5px;position:relative;}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:28%;height:1px;background:#e2e8f0;}
+.divider::before{left:0;}.divider::after{right:0;}
+.demo-pills{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+.demo-btn{
+  padding:6.5px 13px;
+  border-radius:18px;
+  border:1.5px solid #e2e8f0;
+  background:#f8fafc;
+  color:#475569;
+  font-size:11.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s cubic-bezier(0.16,1,0.3,1);
+  font-family:inherit;
+}
+.demo-btn:hover{
+  border-color:#2563eb;
+  color:#2563eb;
+  background:#eff6ff;
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(37,99,235,0.14);
+}
+.pwd-guide{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:11px;color:#64748b;line-height:1.5;margin-top:12px;}
+.pwd-guide span{color:#0f172a;font-weight:600;}
+.status-msg{text-align:center;font-size:12px;margin-top:10px;min-height:16px;padding:5px 10px;border-radius:6px;}
+.status-msg.error{color:#dc2626;background:#fef2f2;}
+.status-msg.success{color:#16a34a;background:#f0fdf4;}
+.status-msg.info{color:#2563eb;background:#eff6ff;}
+
+/* DIRECTORY MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-backdrop.open{display:flex;}
+.modal-box{background:#fff;border-radius:18px;padding:24px;width:680px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.modal-head h3{font-size:18px;font-weight:700;color:#0f172a;}
+.close-btn{background:none;border:none;font-size:22px;color:#94a3b8;cursor:pointer;padding:0 4px;line-height:1;}
+.close-btn:hover{color:#0f172a;}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;}
+.filter-bar input{flex:1;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;}
+.filter-bar input:focus{border-color:#2563eb;}
+.tab-pills{display:flex;gap:6px;margin-bottom:12px;}
+.tab-pill{padding:5px 12px;border-radius:14px;border:1px solid #e2e8f0;background:#f8fafc;font-size:11.5px;font-weight:600;cursor:pointer;color:#64748b;}
+.tab-pill.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.user-list{flex:1;overflow-y:auto;border:1px solid #e2e8f0;border-radius:10px;}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #f1f5f9;transition:background 0.15s;}
+.user-row:last-child{border-bottom:none;}
+.user-row:hover{background:#f8fafc;}
+.user-left{display:flex;align-items:center;gap:10px;}
+.badge-code{background:#eff6ff;color:#1e40af;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:6px;font-family:monospace;}
+.user-info{font-size:12.5px;}
+.user-name{font-weight:600;color:#0f172a;}
+.user-meta{font-size:11px;color:#64748b;}
+.select-btn{padding:5px 12px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;transition:background 0.15s;}
+.select-btn:hover{background:#1d4ed8;}
+</style>
+</head>
+<body>
+
+<!-- Left Branding Panel -->
+<div class="left-panel">
+  <canvas id="loginCanvas"></canvas>
+  <div class="left-content-wrap">
+    <div class="logo-shield">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 3L35 8C35 25 20 37 20 37C20 37 5 25 5 8L20 3Z" fill="white" fill-opacity="0.9"/>
+        <line x1="20" y1="13" x2="20" y2="27" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="13" y1="20" x2="27" y2="20" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="brand-name">CampusHub ERP</div>
+    <div class="brand-sub">Smart Campus Management System<br/>Java OOP End-Semester Project</div>
+    <div class="feature-pills">
+      <div class="pill"><div class="pill-dot"></div>OOP Concepts Fully Demonstrated</div>
+      <div class="pill"><div class="pill-dot"></div>287 Pre-Loaded Active User Profiles</div>
+      <div class="pill"><div class="pill-dot"></div>Multithreading &amp; File I/O (Unit 2)</div>
+      <div class="pill"><div class="pill-dot"></div>Role Hierarchy: HOD › Faculty › Student</div>
+    </div>
+
+    <!-- Project Owner & Lead Architect Card -->
+    <div class="creator-card">
+      <div class="creator-avatar">RR</div>
+      <div class="creator-content">
+        <div class="creator-badge-tag">Project Owner &amp; Architect</div>
+        <div class="creator-name">Raushan Raj</div>
+        <div class="creator-role">Lead Developer · Java OOP Final Project</div>
+      </div>
+    </div>
+
+    <div class="version">v2.0 Web Edition · Spring Boot · Java 17</div>
+  </div>
+</div>
+
+<!-- Right Login Form -->
+<div class="right-panel">
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:440px;">
+    <div class="form-card" style="margin-bottom:0;">
+      <div class="form-title">Welcome back</div>
+      <div class="form-sub">Sign in with any student UID, faculty code, or admin ID</div>
+
+      <div class="notice-box">
+        <b>✓ All 287 campus users are active!</b> You can log in as any student (25BCS0001–0080, 24BCS, 25BET, 25BBE, 25MCA), any professor, or HOD.
+      </div>
+
+      <label class="field-label">Username / Student UID / Employee Code</label>
+      <div class="input-wrap with-icon">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <input type="text" id="username" placeholder="e.g. admin, 25bcs0001, fac_cse_01" value="admin" autocomplete="username"/>
+      </div>
+
+      <label class="field-label">Password</label>
+      <div class="input-wrap with-icon" style="margin-bottom:6px">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <input type="password" id="password" placeholder="Enter your password" value="Admin@123" autocomplete="current-password"/>
+        <button class="eye-btn" onclick="togglePwd()" title="Show/Hide password" id="eyeBtn">
+          <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12c0 0 4-7 9-7s9 7 9 7-4 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign In to CampusHub</button>
+
+      <button class="btn-directory" onclick="openDirectoryModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Browse All 287 Users &amp; 1-Click Login
+      </button>
+
+      <div class="divider">Quick Demo Access</div>
+      <div class="demo-pills">
+        <button class="demo-btn" onclick="fillDemo('admin','Admin@123')">HOD / Admin</button>
+        <button class="demo-btn" onclick="fillDemo('fac_cse_01','Faculty@123')">Faculty Demo</button>
+        <button class="demo-btn" onclick="fillDemo('25bcs0001','Student@123')">Student Demo</button>
+      </div>
+
+      <div class="pwd-guide">
+        <b>Default Passwords:</b><br/>
+        • Any Student (260 total): <span>Student@123</span><br/>
+        • Any Faculty (25 total): <span>Faculty@123</span><br/>
+        • HOD / Admin: <span>Admin@123</span>
+      </div>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+
+    <!-- Owner / Creator Footer Note -->
+    <div class="page-footer-note">
+      Crafted &amp; Engineered by <b>Raushan Raj</b> · Smart Campus Management System
+    </div>
+  </div>
+</div>
+
+<!-- USER DIRECTORY MODAL -->
+<div class="modal-backdrop" id="dirModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3>Campus User Directory (287 Total)</h3>
+        <span style="font-size:12px;color:#64748b;">Click "Login" on any account to immediately fill and sign in</span>
+      </div>
+      <button class="close-btn" onclick="closeDirectoryModal()">&times;</button>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="dirSearch" placeholder="Search by name, UID (25bcs...), emp code (fac_cse...), or dept..." oninput="filterDirectory()"/>
+    </div>
+
+    <div class="tab-pills">
+      <button class="tab-pill active" onclick="switchTab('ALL', this)">All (287)</button>
+      <button class="tab-pill" onclick="switchTab('STUDENTS', this)">Students (260)</button>
+      <button class="tab-pill" onclick="switchTab('FACULTY', this)">Faculty (25)</button>
+      <button class="tab-pill" onclick="switchTab('ADMINS', this)">HOD / Admin (2)</button>
+    </div>
+
+    <div class="user-list" id="dirList">
+      <div style="text-align:center;padding:30px;color:#94a3b8;font-size:13px;">Loading directory...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let pwdVisible = false;
+let dirData = null;
+let currentTab = 'ALL';
+
+function togglePwd() {
+  pwdVisible = !pwdVisible;
+  const p = document.getElementById('password');
+  const icon = document.getElementById('eyeIcon');
+  p.type = pwdVisible ? 'text' : 'password';
+  icon.innerHTML = pwdVisible
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5 0-9-7-9-7a18.45 18.45 0 0 1 2.06-3.07"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c5 0 9 7 9 7a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M3 12c0 0 4-7 9-7s9 7 9 7-4 7-9 7-9-7-9-7z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+function fillDemo(u, p) {
+  document.getElementById('username').value = u;
+  document.getElementById('password').value = p;
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = 'status-msg ' + type;
+}
+
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  if (!username || !password) { showStatus('Please enter username and password', 'error'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Authenticating...';
+  showStatus('Verifying credentials...', 'info');
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showStatus('Login successful! Welcome, ' + data.name, 'success');
+      window.location.href = '/dashboard';
+    } else {
+      showStatus(data.message || 'Invalid credentials', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Sign In to CampusHub';
+    }
+  } catch(e) {
+    showStatus('Connection error: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'Sign In to CampusHub';
+  }
+}
+
+// ===== DIRECTORY POPUP =====
+async function openDirectoryModal() {
+  document.getElementById('dirModal').classList.add('open');
+  if (!dirData) {
+    try {
+      const res = await fetch('/api/auth/directory');
+      dirData = await res.json();
+    } catch (e) {
+      document.getElementById('dirList').innerHTML = '<div style="color:red;padding:20px;">Could not load directory</div>';
+      return;
+    }
+  }
+  filterDirectory();
+}
+
+function closeDirectoryModal() {
+  document.getElementById('dirModal').classList.remove('open');
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterDirectory();
+}
+
+function filterDirectory() {
+  if (!dirData) return;
+  const q = document.getElementById('dirSearch').value.toLowerCase().trim();
+  let list = [];
+
+  if (currentTab === 'ALL' || currentTab === 'ADMINS') {
+    (dirData.admins || []).forEach(a => {
+      if (!q || a.name.toLowerCase().includes(q) || a.username.toLowerCase().includes(q) || a.dept.toLowerCase().includes(q)) {
+        list.push({ code: a.username, name: a.name, meta: a.role + ' · ' + a.dept, uname: a.username, pwd: a.pwd });
+      }
+    });
+  }
+
+  if (currentTab === 'ALL' || currentTab === 'FACULTY') {
+    (dirData.faculties || []).forEach(f => {
+      if (!q || f.name.toLowerCase().includes(q) || f.empCode.toLowerCase().includes(q) || f.username.toLowerCase().includes(q) || f.dept.toLowerCase().includes(q)) {
+        list.push({ code: f.empCode, name: f.name, meta: f.designation + ' · ' + f.dept, uname: f.username, pwd: f.pwd });
+      }
+    });
+  }
+
+  if (currentTab === 'ALL' || currentTab === 'STUDENTS') {
+    (dirData.students || []).forEach(s => {
+      if (!q || s.name.toLowerCase().includes(q) || s.uid.toLowerCase().includes(q) || s.username.toLowerCase().includes(q) || s.dept.toLowerCase().includes(q)) {
+        list.push({ code: s.uid, name: s.name, meta: s.dept + ' · Sem ' + s.sem + ' Sec ' + s.sec, uname: s.username, pwd: s.pwd });
+      }
+    });
+  }
+
+  const container = document.getElementById('dirList');
+  if (list.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;">No matching users found</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(u => `
+    <div class="user-row">
+      <div class="user-left">
+        <span class="badge-code">${u.code}</span>
+        <div class="user-info">
+          <div class="user-name">${u.name}</div>
+          <div class="user-meta">${u.meta}</div>
+        </div>
+      </div>
+      <button class="select-btn" onclick="selectAndLogin('${u.uname}', '${u.pwd}')">Login as User</button>
+    </div>
+  `).join('');
+}
+
+function selectAndLogin(u, p) {
+  fillDemo(u, p);
+  closeDirectoryModal();
+  doLogin();
+}
+
+document.getElementById('dirModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeDirectoryModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ===== LIVE 60-120 FPS PARTICLE CONSTELLATION ANIMATION =====
+(function initParticleCanvas() {
+  const canvas = document.getElementById('loginCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w = 0, h = 0, particles = [];
+  const mouse = { x: null, y: null, radius: 110 };
+
+  function resize() {
+    if (!canvas.parentElement) return;
+    w = canvas.width = canvas.parentElement.offsetWidth;
+    h = canvas.height = canvas.parentElement.offsetHeight;
+    initParticles();
+  }
+  window.addEventListener('resize', resize);
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+  canvas.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+  function initParticles() {
+    particles = [];
+    const count = Math.max(24, Math.min(45, Math.floor((w * h) / 12000)));
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 1.6 + 0.9,
+        alpha: Math.random() * 0.45 + 0.35
+      });
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, w, h);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+
+      // Mouse interactive connection
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouse.radius) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(96, 165, 250, ${(1 - dist / mouse.radius) * 0.45})`;
+          ctx.lineWidth = 1;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+      }
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(147, 197, 253, ${p.alpha})`;
+      ctx.fill();
+
+      // Connect nearby particles
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 85) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(96, 165, 250, ${(1 - d / 85) * 0.25})`;
+          ctx.lineWidth = 0.7;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(render);
+  }
+
+  setTimeout(resize, 50);
+  render();
+})();
+</script>
+</body>
+</html>
